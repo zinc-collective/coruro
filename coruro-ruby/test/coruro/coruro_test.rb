@@ -1,5 +1,4 @@
 require 'pry'
-require 'mail'
 require "test_helper"
 Mail.defaults do
   delivery_method :smtp, address: "localhost", port: 1025
@@ -19,6 +18,11 @@ class CoruroTest < Minitest::Test
 
   def test_that_it_has_a_version_number
     refute_nil ::Coruro::VERSION
+  end
+
+  def test_all
+    mails = @coruro.all
+    refute_empty(mails)
   end
 
   def test_where_recipient_matches_to

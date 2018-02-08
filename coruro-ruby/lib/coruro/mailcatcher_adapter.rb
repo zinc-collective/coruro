@@ -1,17 +1,30 @@
 require 'net/http'
 require 'json'
 require 'open3'
+require 'singleton'
 
 class Coruro
   # Translates between Curoro and Mailcatcher's API
   class MailcatcherAdapter
-    attr_accessor :runner
+    attr_accessor :runner, :timeout
+    def initialize(timeout:)
+      self.timeout = timeout
+    end
+
+    def all
+      messages
+    end
+
     def where(to: nil, from: nil, subject: nil)
-      messages.select do |message|
-        match?(to, message[:recipients]) ||
-        match?(from, message[:sender]) ||
-        match?(subject, message[:subject])
-      end.map(&method(:find_by))
+      result = []; start_time = Time.now.to_f
+      while (result.empty? || (Time.now.to_f - start_time) <=  timeout)
+        result = messages.select do |message|
+          match?(to, message[:recipients]) ||
+          match?(from, message[:sender]) ||
+          match?(subject, message[:subject])
+        end.map(&method(:find_by))
+      end
+      result
     end
 
     def match?(query, value)

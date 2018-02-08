@@ -1,3 +1,7 @@
+require 'mail'
+
+require_relative 'coruro/version'
+
 require_relative 'coruro/message'
 
 require_relative 'coruro/mailcatcher_adapter'
@@ -5,12 +9,12 @@ require_relative 'coruro/mailcatcher_adapter'
 class Coruro
   attr_accessor :adapter
   extend Forwardable
-  def_delegators :adapter, :where, :stop
+  def_delegators :adapter, :all, :where, :stop
 
-  def initialize(adapter:, on_wait_tick: -> (count) { })
+  def initialize(adapter:, on_wait_tick: -> (count) { }, timeout: 0.1)
     case adapter
     when :mailcatcher
-      self.adapter = MailcatcherAdapter.new
+      self.adapter = MailcatcherAdapter.new(timeout: timeout)
       self.adapter.start
     else
       raise UnrecognizedAdapterError, adapter
