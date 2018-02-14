@@ -75,6 +75,7 @@ class Coruro
       end
 
       def stop
+        return unless self.thread
         self.stdin.close
         self.stdout.close
         self.stderr.close
