@@ -83,15 +83,18 @@ class Coruro
 
 
       def start(config)
-        puts up?(config)
-        puts config
+        p up?(config)
+        p config
         return if up?(config)
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f', { unsetenv_others:true })
+        p self.thread
+
       end
 
       def up?(config)
         response = Net::HTTP.get_response(URI("#{config.http_root}"))
+        p response
         response.is_a?(Net::HTTPSuccess)
       rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL => _
         false
