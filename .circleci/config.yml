@@ -6,7 +6,6 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
        - image: circleci/ruby:2.4.3-node-browsers
 
     working_directory: ~/repo
@@ -24,6 +23,11 @@ jobs:
           name: "Install mailcatcher"
           command: |
             gem install mailcatcher
+
+      - run:
+          name: "WTF is rnning already?"
+          command:
+            sudo netstat -plntu
 
       - run:
           name: install dependencies
