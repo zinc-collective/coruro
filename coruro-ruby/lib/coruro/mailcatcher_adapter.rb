@@ -85,8 +85,18 @@ class Coruro
       def start(config)
         p ENV.keys.grep(/BUNDLE/)
         return if up?(config)
-        new_env = { "PATH" => ENV['PATH'], "BUNDLE_GEMFILE" => "BUNDLER_ORIG_BUNDLE_GEMFILE",
-                    "BUNDLE_BIN_PATH" => "BUNDLER_ORIG_BUNDLE_BIN_PATH" }
+        new_env = {
+          "BUNDLE_GEMFILE" => ENV["BUNDLER_ORIG_BUNDLE_GEMFILE"],
+          "BUNDLE_BIN_PATH" => ENV["BUNDLER_ORIG_BUNDLE_BIN_PATH"],
+          "MANPATH" => ENV["BUNDLER_ORIG_MANPATH"],
+          "BUNDLE_BIN_PATH" => ENV["BUNDLER_ORIG_BIN_PATH"],
+          "RUBYOPT" => ENV["BUNDLER_ORIG_RUBYOPT"],
+          "RB_USER_INSTALL" => ENV["BUNDLER_ORIG_RB_USER_INSTALL"],
+          "GEM_HOME" => ENV["BUNDLER_ORIG_GEM_HOME"],
+          "GEM_PATH" => ENV["BUNDLER_ORIG_GEM_PATH"],
+          "PATH" => ENV["BUNDLER_ORIG_PATH"],
+          "RUBYLIB" => ENV["BUNDLER_ORIG_RUBYLIB"]
+        }
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3(new_env, 'mailcatcher -f --ip=0.0.0.0', { unsetenv_others:true })
 
