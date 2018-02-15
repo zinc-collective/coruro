@@ -86,6 +86,7 @@ class Coruro
         p up?(config)
         p config
         return if up?(config)
+        p ENV['PATH']
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f', { unsetenv_others:true })
         p self.thread
