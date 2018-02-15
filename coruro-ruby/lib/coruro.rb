@@ -15,7 +15,7 @@ class Coruro
     case adapter
     when :mailcatcher
       self.adapter = MailcatcherAdapter.new(timeout: timeout, config: adapter_config)
-      self.adapter.start
+      self.adapter.start unless self.adapter.up?
     else
       raise UnrecognizedAdapterError, adapter
     end
