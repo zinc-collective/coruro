@@ -11,10 +11,10 @@ class Coruro
   extend Forwardable
   def_delegators :adapter, :all, :where, :stop
 
-  def initialize(adapter:, on_wait_tick: -> (count) { }, timeout: 0.1)
+  def initialize(adapter:, on_wait_tick: -> (count) { }, timeout: 0.1, adapter_config: {})
     case adapter
     when :mailcatcher
-      self.adapter = MailcatcherAdapter.new(timeout: timeout)
+      self.adapter = MailcatcherAdapter.new(timeout: timeout, config: adapter_config)
       self.adapter.start
     else
       raise UnrecognizedAdapterError, adapter

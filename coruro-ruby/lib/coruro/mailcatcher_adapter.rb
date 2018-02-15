@@ -4,11 +4,25 @@ require 'open3'
 require 'singleton'
 
 class Coruro
+  class Configuration
+    attr_accessor :config
+    def initialize(config)
+      self.config = config
+    end
+
+    def http_root
+      self.config[:http_root] || 'http://localhost:1080'
+    end
+  end
   # Translates between Curoro and Mailcatcher's API
   class MailcatcherAdapter
-    attr_accessor :runner, :timeout
-    def initialize(timeout:)
+    attr_accessor :runner, :timeout, :config
+    extend Forwardable
+    def_delegators :runner, :stop
+    def_delegators :config, :http_root
+    def initialize(timeout:, config:)
       self.timeout = timeout
+      self.config = Configuration.new(config)
     end
 
     def all
@@ -34,19 +48,25 @@ class Coruro
       raise ArgumentError, "Query #{query} must respond to `match?` or Value #{value} must respond to `any?`"
     end
 
-    extend Forwardable
-    def_delegators :runner, :up?, :start, :stop
+
+    def up?
+      runner.up?(config)
+    end
+
+    def start
+      runner.start(config)
+    end
 
     def runner
       @_runner ||= Runner.instance
     end
 
     private def messages
-      JSON.parse(Net::HTTP.get(URI("http://127.0.0.1:1080/messages")), symbolize_names: true)
+      JSON.parse(Net::HTTP.get(URI("#{http_root}/messages")), symbolize_names: true)
     end
 
     private def raw_message(message_id)
-      Net::HTTP.get(URI("http://127.0.0.1:1080/messages/#{message_id}.eml"))
+      Net::HTTP.get(URI("#{http_root}/messages/#{message_id}.eml"))
     end
 
 
@@ -59,16 +79,17 @@ class Coruro
     # Allows for launching and terminating mailcatcher programmaticaly
     class Runner
       include Singleton
-      attr_accessor :stdin, :stdout, :stderr, :thread
+      attr_accessor :stdin, :stdout, :stderr, :thread, :config
 
-      def start
-        return if up?
+
+      def start(config)
+        return if up?(config)
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f', { unsetenv_others:true })
       end
 
-      def up?
-        response = Net::HTTP.get_response(URI('http://127.0.0.1:1080'))
+      def up?(config)
+        response = Net::HTTP.get_response(URI("#{config.http_root}"))
         response.is_a?(Net::HTTPSuccess)
       rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL => _
         false
