@@ -11,7 +11,7 @@ class Coruro
     end
 
     def http_root
-      self.config[:http_root] || 'http://127.0.0.1:1080'
+      self.config[:http_root] || 'http://localhost:1080'
     end
   end
   # Translates between Curoro and Mailcatcher's API
@@ -86,6 +86,8 @@ class Coruro
         return if up?(config)
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f', { unsetenv_others:true })
+
+        p "Status", self.thread.status
       end
 
       def up?(config)
