@@ -45,9 +45,3 @@ jobs:
           command: |
             cd coruro-ruby
             bin/rake
-
-      - run:
-          name: run cucumber
-          command: |
-            cd coruro-ruby
-            bin/cucumber --tags ~@wip
