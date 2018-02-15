@@ -11,7 +11,7 @@ class Coruro
     end
 
     def http_root
-      self.config[:http_root] || 'http://localhost:1080'
+      self.config[:http_root] || 'http://127.0.0.1:1080'
     end
   end
   # Translates between Curoro and Mailcatcher's API
@@ -83,18 +83,13 @@ class Coruro
 
 
       def start(config)
-        p up?(config)
-        p config.http_root
         return if up?(config)
-        p ENV['PATH']
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f', { unsetenv_others:true })
-        p self.thread.status
       end
 
       def up?(config)
         response = Net::HTTP.get_response(URI("#{config.http_root}"))
-        p response
         response.is_a?(Net::HTTPSuccess)
       rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL => _
         false
