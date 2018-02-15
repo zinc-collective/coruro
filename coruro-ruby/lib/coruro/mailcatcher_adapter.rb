@@ -87,7 +87,17 @@ class Coruro
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f --ip=0.0.0.0', { unsetenv_others:true })
 
-        p "Status", self.thread.status
+        Thread.new {
+          while line = self.stdout.gets do
+            puts(line)
+          end
+        }
+
+        Thread.new {
+          while line = self.stderr.gets do
+            puts(line)
+          end
+        }
       end
 
       def up?(config)
@@ -98,11 +108,10 @@ class Coruro
       end
 
       def stop
+
         return unless self.thread
         self.stdin.close
-        p self.stdout.read
         self.stdout.close
-        p self.stderr.read
         self.stderr.close
         `kill -9 #{ thread[:pid] }`
       end
