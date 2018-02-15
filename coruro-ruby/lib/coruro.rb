@@ -28,6 +28,7 @@ class Coruro
     until adapter.up? || count > 5
       on_tick.call(count)
       sleep(1)
+      count = count + 1
     end
   end
 
