@@ -1,7 +1,7 @@
 require 'pry'
 require "test_helper"
 Mail.defaults do
-  delivery_method :smtp, address: "127.0.01", port: 1025
+  delivery_method :smtp, address: "127.0.0.1", port: 1025
 end
 
 class CoruroTest < Minitest::Test
