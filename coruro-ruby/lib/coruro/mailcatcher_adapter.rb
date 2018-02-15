@@ -85,7 +85,7 @@ class Coruro
       def start(config)
         return if up?(config)
         self.stdin, self.stdout, self.stderr, self.thread =
-          Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f', { unsetenv_others:true })
+          Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f --ip=0.0.0.0', { unsetenv_others:true })
 
         p "Status", self.thread.status
       end
