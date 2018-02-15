@@ -84,13 +84,12 @@ class Coruro
 
       def start(config)
         p up?(config)
-        p config
+        p config.http_root
         return if up?(config)
         p ENV['PATH']
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3({ "PATH" => ENV['PATH'] }, 'mailcatcher -f', { unsetenv_others:true })
-        p self.thread
-
+        p self.thread.status
       end
 
       def up?(config)
