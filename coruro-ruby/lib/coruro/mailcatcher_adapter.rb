@@ -100,7 +100,9 @@ class Coruro
       def stop
         return unless self.thread
         self.stdin.close
+        p self.stdout.read
         self.stdout.close
+        p self.stderr.read
         self.stderr.close
         `kill -9 #{ thread[:pid] }`
       end
