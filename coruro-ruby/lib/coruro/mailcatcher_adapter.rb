@@ -83,7 +83,7 @@ class Coruro
 
 
       def start(config)
-        puts up?
+        puts up?(config)
         puts config
         return if up?(config)
         self.stdin, self.stdout, self.stderr, self.thread =
