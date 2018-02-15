@@ -3,7 +3,8 @@ Given("mailcatcher is not already running") do
 end
 
 When("I instantiate Coruro with the mailcatcher adapter") do
-  Coruro.new(adapter: :mailcatcher)
+  Coruro.new(adapter: :mailcatcher,
+             adapter_config: { expose_streams: { stdout: $stdout, stderr: $stderr } })
 end
 
 

@@ -2,6 +2,7 @@ require 'net/http'
 require 'json'
 require 'open3'
 require 'singleton'
+require_relative 'unbundle'
 
 class Coruro
   class Configuration
@@ -11,9 +12,18 @@ class Coruro
     end
 
     def http_root
-      self.config[:http_root] || 'http://localhost:1080'
+      config.fetch(:http_root, 'http://localhost:1080')
+    end
+
+    def expose_stream?(stream)
+      !expose_streams[stream].nil?
+    end
+
+    def expose_streams
+      config.fetch(:expose_streams, {})
     end
   end
+
   # Translates between Curoro and Mailcatcher's API
   class MailcatcherAdapter
     attr_accessor :runner, :timeout, :config
@@ -79,30 +89,17 @@ class Coruro
     # Allows for launching and terminating mailcatcher programmaticaly
     class Runner
       include Singleton
-      attr_accessor :stdin, :stdout, :stderr, :thread, :config
+      attr_accessor :stdin, :stdout, :stderr, :thread
 
 
       def start(config)
-        p ENV.keys.grep(/BUNDLE/)
         return if up?(config)
-        new_env = ENV.keys.grep(/BUNDLER_ORIG/).reduce({}) do |new_env, env_var|
-          new_env[env_var.gsub("BUNDLER_ORG", "")] = ENV[env_var]
-          new_env
-        end
+        new_env = Unbundle.all(ENV)
         self.stdin, self.stdout, self.stderr, self.thread =
           Open3.popen3(new_env, 'mailcatcher -f --ip=0.0.0.0', { unsetenv_others:true })
 
-        Thread.new {
-          while line = self.stdout.gets do
-            puts(line)
-          end
-        }
-
-        Thread.new {
-          while line = self.stderr.gets do
-            puts(line)
-          end
-        }
+        debug_stream(:stdout, config: config)
+        debug_stream(:stderr, config: config)
       end
 
       def up?(config)
@@ -115,10 +112,27 @@ class Coruro
       def stop
 
         return unless self.thread
-        self.stdin.close
-        self.stdout.close
-        self.stderr.close
+        streams.each do |(_, stream)|
+          stream.close
+        end
         `kill -9 #{ thread[:pid] }`
+      end
+
+      private def debug_stream(stream_name, config:)
+        if config.expose_stream?(stream_name)
+          stream_target = config.expose_streams[stream_name]
+          stream = streams[stream_name]
+          Thread.new {
+            while line = stream.gets do
+              stream_target.puts(line)
+            end
+          }
+        end
+      end
+
+
+      private def streams
+        { stderr: stderr, stdout: stdout, stdin: stdin }
       end
     end
   end
