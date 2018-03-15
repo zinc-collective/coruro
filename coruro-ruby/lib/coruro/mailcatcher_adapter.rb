@@ -41,7 +41,7 @@ class Coruro
 
     def where(to: nil, from: nil, subject: nil)
       result = []; start_time = Time.now.to_f
-      while (result.empty? || (Time.now.to_f - start_time) <=  timeout)
+      while (result.empty? && (Time.now.to_f - start_time) <=  timeout)
         result = messages.select do |message|
           match?(to, message[:recipients]) ||
           match?(from, message[:sender]) ||

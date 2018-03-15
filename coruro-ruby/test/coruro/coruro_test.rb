@@ -33,6 +33,11 @@ class CoruroTest < Minitest::Test
     end
   end
 
+  def test_where_times_out
+    mails = @coruro.where(to: /someone-without-email/)
+    assert_empty(mails)
+  end
+
   def test_where_subject_matches
     mails = @coruro.where(subject: /Hello/)
     refute_empty(mails)
