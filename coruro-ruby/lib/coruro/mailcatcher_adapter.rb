@@ -5,27 +5,9 @@ require 'singleton'
 require_relative 'unbundle'
 
 class Coruro
-  class Configuration
-    attr_accessor :config
-    def initialize(config)
-      self.config = config
-    end
-
-    def http_root
-      config.fetch(:http_root, 'http://localhost:1080')
-    end
-
-    def expose_stream?(stream)
-      !expose_streams[stream].nil?
-    end
-
-    def expose_streams
-      config.fetch(:expose_streams, {})
-    end
-  end
-
   # Translates between Curoro and Mailcatcher's API
   class MailcatcherAdapter
+
     attr_accessor :runner, :timeout, :config
     extend Forwardable
     def_delegators :runner, :stop
@@ -57,7 +39,6 @@ class Coruro
       return value.any? { |child| match?(query, child) } if value.respond_to?(:any?)
       raise ArgumentError, "Query #{query} must respond to `match?` or Value #{value} must respond to `any?`"
     end
-
 
     def up?
       runner.up?(config)
@@ -133,6 +114,25 @@ class Coruro
 
       private def streams
         { stderr: stderr, stdout: stdout, stdin: stdin }
+      end
+    end
+
+    class Configuration
+      attr_accessor :config
+      def initialize(config)
+        self.config = config
+      end
+
+      def http_root
+        config.fetch(:http_root, 'http://localhost:1080')
+      end
+
+      def expose_stream?(stream)
+        !expose_streams[stream].nil?
+      end
+
+      def expose_streams
+        config.fetch(:expose_streams, {})
       end
     end
   end
