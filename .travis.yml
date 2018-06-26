@@ -9,7 +9,7 @@ before_install:
   - gem install mailcatcher
 
 install:
-  - cd coruro-ruby && bundle install --path vendor/bundle
+  - (cd coruro-ruby && bundle install --path vendor/bundle)
 
-script: cd coruro-ruby && bin/rake
+script: (cd coruro-ruby && bin/rake)
 
