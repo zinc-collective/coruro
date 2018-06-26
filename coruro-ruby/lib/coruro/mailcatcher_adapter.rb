@@ -35,8 +35,9 @@ class Coruro
 
     def match?(query, value)
       return false if query.nil?
-      return query.match?(value) if query.respond_to?(:match?) && !value.respond_to?(:any?)
       return value.any? { |child| match?(query, child) } if value.respond_to?(:any?)
+      return query.match?(value) if query.respond_to?(:match?)
+      return !query.match(value).nil? if query.respond_to?(:match)
       raise ArgumentError, "Query #{query} must respond to `match?` or Value #{value} must respond to `any?`"
     end
 
