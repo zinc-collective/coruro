@@ -12,9 +12,8 @@ class Coruro
   def_delegators :adapter, :all, :where, :stop
 
   def initialize(adapter:, on_wait_tick: -> (count) { }, timeout: 1.0, adapter_config: {})
-    case adapter
-    when :mailcatcher
-      self.adapter = MailcatcherAdapter.new(timeout: timeout, config: adapter_config)
+    if adapters.key?(adapter)
+      self.adapter = adapters[adapter].new(timeout: timeout, config: adapter_config)
       self.adapter.start unless self.adapter.up?
     else
       raise UnrecognizedAdapterError, adapter
@@ -33,5 +32,14 @@ class Coruro
   end
 
   class UnrecognizedAdapterError < StandardError; end
+
+
+  def adapters
+    self.class.adapters
+  end
+
+  def self.adapters
+    @adapters ||= { mailcatcher: MailcatcherAdapter }
+  end
 end
 
