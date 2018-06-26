@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    coruro-ruby (0.5.0)
+    coruro-ruby (0.6.0)
       mail (~> 2.7.0)
 
 GEM
@@ -52,4 +52,4 @@ DEPENDENCIES
   rake (~> 10.0)
 
 BUNDLED WITH
-   1.16.1
+   1.16.2
