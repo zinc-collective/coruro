@@ -9,6 +9,10 @@ rvm:
 before_install:
   - gem install bundler -v 1.16.1
   - gem install mailcatcher
+env:
+  # This doesn't matter just yet, so long as there's a server
+  # listening for http requests
+  MAILCATCHER_ADAPTER_REMOTE_HOST: "https://www.zinc.coop/"
 
 install:
   - (cd coruro-ruby && bundle install --path vendor/bundle)

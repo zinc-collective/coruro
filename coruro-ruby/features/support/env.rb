@@ -1,6 +1,13 @@
+require 'dotenv/load'
+
 require 'coruro'
 
 require 'minitest/spec'
+require 'sys/proctable'
+require 'pry'
+
+Dotenv.load
+
 
 class MinitestWorld
   include Minitest::Assertions
